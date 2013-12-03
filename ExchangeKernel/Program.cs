@@ -17,8 +17,11 @@ namespace ExchangeKernel
             new Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>>();
         static Dictionary<long, Order> orders = new Dictionary<long, Order>();
         static byte[] OK = new byte[1];
+        static byte[] ALREADY_HERE = new byte[1]; 
+        
         static void Main(string[] args)
         {
+            ALREADY_HERE[0] = 1;
             try
             {
                 string[] lines = System.IO.File.ReadAllLines("users.csv");
@@ -52,8 +55,16 @@ namespace ExchangeKernel
             }
             if (msg is RegisterMessage)
             {
-                users[(msg as RegisterMessage).login] = new User(msg as RegisterMessage);
-                rep.Send(OK);
+                if (!users.ContainsKey((msg as RegisterMessage).login))
+                {
+                    users[(msg as RegisterMessage).login] = new User(msg as RegisterMessage);
+                    rep.Send(OK);
+                }
+                else
+                {
+                    rep.Send(ALREADY_HERE);
+                }
+
             }
             if (msg is ShutDownMessage)
             {
