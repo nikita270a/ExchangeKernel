@@ -86,6 +86,9 @@ namespace ExchangeKernel
             {
                 PlaceMessage pm = msg as PlaceMessage;
                 Order o = new Order(pm);
+
+                //проверка на валидность заявки
+
                 rep.Send(BitConverter.GetBytes(o.id));
                 pub.Send(o.AddedString());
                 orders[o.id] = o;
