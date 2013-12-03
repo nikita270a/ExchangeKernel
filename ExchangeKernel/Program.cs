@@ -15,10 +15,14 @@ namespace ExchangeKernel
         #region error codes
         static byte[] OK = new byte[1];
         static byte[] ALREADY_HERE = new byte[1];
+        static byte[] USER_NOT_FOUND = new byte[1];
+        static byte[] ORDER_NOT_FOUND = new byte[1];
         #endregion
         static private void InitErrMessages()
         {
             ALREADY_HERE[0] = 1;
+            USER_NOT_FOUND[0] = 2;
+            ORDER_NOT_FOUND[0] = 2;
         }
         static void Main(string[] args)
         {
@@ -146,30 +150,15 @@ namespace ExchangeKernel
             }
             if (msg is CancelMessage)
             {
-                CancelMessage cm = msg as CancelMessage;
-                if (orders[cm.id].buy)
+                int r = ex.CancelOrder(msg as CancelMessage);
+                switch (r)
                 {
-                    for (int i = 0; i < buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].Count; ++i)
-                    {
-                        if (buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].id == cm.id)
-                        {
-                            buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].RemoveAt(i);
-                            break;
-                        }
-                    }
+                    case -1: rep.Send(USER_NOT_FOUND);
+                        break;
+                    case -2: rep.Send(ORDER_NOT_FOUND);
+                        break;
+                    default: rep.Send(OK);
                 }
-                else
-                {
-                    for (int i = 0; i < sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].Count; ++i)
-                    {
-                        if (sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].id == cm.id)
-                        {
-                            sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].RemoveAt(i);
-                            break;
-                        }
-                    }
-                }
-                rep.Send(OK);
             }
         }
     }

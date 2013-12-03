@@ -48,9 +48,12 @@ namespace ExchangeKernel
     class CancelMessage : Message
     {
         public long id;
+        public string user_id;
         public CancelMessage(byte[] msg)
         {
             id = BitConverter.ToInt64(msg, 4);
+            int len = BitConverter.ToInt32(msg, 12);
+            user_id = System.Text.Encoding.ASCII.GetString(msg, 16, len);
         }
     }
     class ShutDownMessage : Message

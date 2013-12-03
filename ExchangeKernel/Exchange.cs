@@ -45,5 +45,50 @@ namespace ExchangeKernel
             }
             System.IO.File.WriteAllLines("users.csv", lines);
         }
+        internal int CancelOrder(CancelMessage cm)
+        {
+            bool ok = false;
+            if (!users.ContainsKey(cm.user_id))
+            {
+                return -1;
+            }
+            if (orders[cm.id].buy)
+            {
+                for (int i = 0; i < buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].Count; ++i)
+                {
+                    if (buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].id == cm.id)
+                    {
+                        if (buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].user != cm.user_id)
+                        {
+                            return -1;
+                        }
+                        buy[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].RemoveAt(i);
+                        ok = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].Count; ++i)
+                {
+                    if (sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].id == cm.id)
+                    {
+                        if (sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price][i].user != cm.user_id)
+                        {
+                            return -1;
+                        }
+                        sell[orders[cm.id].asset1][orders[cm.id].asset2][orders[cm.id].price].RemoveAt(i);
+                        ok = true;
+                        break;
+                    }
+                }
+            }
+            if (!ok)
+            {
+                return -2;
+            }
+            return 0;
+        }
     }
 }
