@@ -10,12 +10,7 @@ namespace ExchangeKernel
     {
         static ZMQ.Context cntx = new ZMQ.Context();
         static ZMQ.Socket rep, pub;
-        static Dictionary<string, User> users = new Dictionary<string, User>();
-        static Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>> buy =
-            new Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>>();
-        static Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>> sell =
-            new Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>>();
-        static Dictionary<long, Order> orders = new Dictionary<long, Order>();
+        static Exchange ex = new Exchange();
 
         #region error codes
         static byte[] OK = new byte[1];
@@ -28,16 +23,6 @@ namespace ExchangeKernel
         static void Main(string[] args)
         {
             InitErrMessages();
-            try
-            {
-                string[] lines = System.IO.File.ReadAllLines("users.csv");
-                foreach (string line in lines)
-                {
-                    users[line.Split(';')[0]] = new User(line);
-                }
-            }
-            catch (Exception)
-            { }
             rep = cntx.Socket(ZMQ.SocketType.REP);
             rep.Bind("tcp://*:1000");
             pub = cntx.Socket(ZMQ.SocketType.PUB);
@@ -61,16 +46,14 @@ namespace ExchangeKernel
             }
             if (msg is RegisterMessage)
             {
-                if (!users.ContainsKey((msg as RegisterMessage).login))
+                if (ex.RegisterUser(msg as RegisterMessage))
                 {
-                    users[(msg as RegisterMessage).login] = new User(msg as RegisterMessage);
                     rep.Send(OK);
                 }
                 else
                 {
                     rep.Send(ALREADY_HERE);
                 }
-
             }
             if (msg is ShutDownMessage)
             {
