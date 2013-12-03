@@ -10,12 +10,12 @@ namespace ExchangeKernel
     {
         public string login;
         public string password;
-        public List<Tuple<long, long>> eq;
+        public List<MyTuple<long, long>> eq;
 
         static readonly string[] currencies;
-        static readonly Dictionary<string, int> num;
+        static public readonly Dictionary<string, int> num;
 
-        const int MAGIC = 100 * 1000 * 1000;
+        public const int MAGIC = 100 * 1000 * 1000;
         static User()
         {
             currencies = "RUR\tUSD\tEUR\tBTC\tLTC".Split('\t');
@@ -33,21 +33,21 @@ namespace ExchangeKernel
             for (int i = 2; i < parts.Length; ++i)
             {
                 string[] parts2 = parts[i].Split('.');
-                eq.Add(new Tuple<long, long>(Convert.ToInt64(parts2[0]), Convert.ToInt64(parts2[1])));
+                eq.Add(new MyTuple<long, long>(Convert.ToInt64(parts2[0]), Convert.ToInt64(parts2[1])));
             }
             while (eq.Count < currencies.Length)
             {
-                eq.Add(new Tuple<long, long>(0, 0));
+                eq.Add(new MyTuple<long, long>(0, 0));
             }
         }
         public User(RegisterMessage msg)
         {
             login = msg.login;
             password = msg.password;
-            eq = new List<Tuple<long, long>>();
+            eq = new List<MyTuple<long, long>>();
             while (eq.Count < currencies.Length)
             {
-                eq.Add(new Tuple<long, long>(0, 0));
+                eq.Add(new MyTuple<long, long>(0, 0));
             }
         }
         public void AddAsset(string asset, long quantity)
@@ -66,7 +66,7 @@ namespace ExchangeKernel
                 --i;
                 r += MAGIC;
             }
-            eq[num[asset]] = new Tuple<long, long>(i, r);
+            eq[num[asset]] = new MyTuple<long, long>(i, r);
         }
         public void AddCurrency(string asset, long quantity, MyTuple<long, long> price)
         {
@@ -86,9 +86,9 @@ namespace ExchangeKernel
                 --i;
                 r += MAGIC;
             }
-            eq[num[asset]] = new Tuple<long, long>(i, r);
+            eq[num[asset]] = new MyTuple<long, long>(i, r);
         }
-        private void MUL(MyTuple<long, long> price, long quantity, out long q1, out long q2)
+        public static void MUL(MyTuple<long, long> price, long quantity, out long q1, out long q2)
         {
             q1 = price.Item1 * quantity + price.Item2 * (quantity / MAGIC) + price.Item2 * (quantity % MAGIC) / MAGIC;
             q2 = price.Item2 * (quantity % MAGIC) % MAGIC;
@@ -96,7 +96,7 @@ namespace ExchangeKernel
         public override string ToString()
         {
             string ans = login + ';' + password;
-            foreach (Tuple<long, long> t in eq)
+            foreach (MyTuple<long, long> t in eq)
             {
                 ans += ';' + t.Item1 + '.' + t.Item2;
             }

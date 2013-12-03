@@ -97,8 +97,24 @@ namespace ExchangeKernel
             Tuple<byte[], List<byte[]>> ans = new Tuple<byte[], List<byte[]>>(BitConverter.GetBytes(o.id), new List<byte[]>());
             ans.Item2.Add(o.AddedString());
             orders[o.id] = o;
-            if (pm.buy)
+
+            if (!users.ContainsKey(pm.user_id))
             {
+                //ошибка, юзера нет
+            }
+            
+            if (pm.buy) //покупаем asset2 за asset1
+            {
+                long q1, q2;
+                User.MUL(pm.price, pm.quantity, out q1, out q2);
+
+                //проверить хватит ли денег
+                if (users[pm.user_id].eq[User.num[pm.asset1]].CompareTo(new MyTuple<long, long>(q1, q2)) < 0)
+                { //денег не хватило
+                }
+
+
+
                 if (!buy.ContainsKey(pm.asset1))
                 {
                     buy[pm.asset1] = new Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>();
@@ -113,8 +129,17 @@ namespace ExchangeKernel
                 }
                 buy[pm.asset1][pm.asset2][pm.price].Add(o);
             }
-            else
+            else //продаем asset2 за asset1
             {
+               //проверить хватит ли денег
+                MyTuple<long, long> T = new MyTuple<long, long>(pm.quantity/User.MAGIC, pm.quantity%User.MAGIC);
+                if (users[pm.user_id].eq[User.num[pm.asset2]].CompareTo(T)<0) ;
+                { //денег не хватило
+                }
+                if (pm.quantity<=0 || pm.price.Item1<0 || pm.price.Item2<0 || (pm.price.Item1)==0 && (pm.price.Item2)==0)
+                {
+                    //проверка на отрицательную смму и количество
+                }
                 if (!buy.ContainsKey(pm.asset1))
                 {
                     buy[pm.asset1] = new Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>();
