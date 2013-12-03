@@ -36,5 +36,14 @@ namespace ExchangeKernel
             }
             return false;
         }
+        internal void ShutDown()
+        {
+            List<string> lines = new List<string>();
+            foreach (User u in users.Values)
+            {
+                lines.Add(u.ToString());
+            }
+            System.IO.File.WriteAllLines("users.csv", lines);
+        }
     }
 }
