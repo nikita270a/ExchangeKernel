@@ -16,12 +16,18 @@ namespace ExchangeKernel
         static Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>> sell =
             new Dictionary<string, Dictionary<string, SortedDictionary<MyTuple<long, long>, List<Order>>>>();
         static Dictionary<long, Order> orders = new Dictionary<long, Order>();
+
+        #region error codes
         static byte[] OK = new byte[1];
-        static byte[] ALREADY_HERE = new byte[1]; 
-        
-        static void Main(string[] args)
+        static byte[] ALREADY_HERE = new byte[1];
+        #endregion
+        static private void InitErrMessages()
         {
             ALREADY_HERE[0] = 1;
+        }
+        static void Main(string[] args)
+        {
+            InitErrMessages();
             try
             {
                 string[] lines = System.IO.File.ReadAllLines("users.csv");
