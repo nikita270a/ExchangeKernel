@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LIB.cs" />
     <Compile Include="Exchange.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MyTuple.cs" />

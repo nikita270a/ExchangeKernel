@@ -9,7 +9,7 @@ namespace ExchangeKernel
     abstract class Message
     {
         const int register = 0;
-        const int shutdown = 1;
+        const int shutdown = 1;`
         const int place    = 2;
         const int cancel   = 3;
         public static Message CreateMessage(byte[] msg)
