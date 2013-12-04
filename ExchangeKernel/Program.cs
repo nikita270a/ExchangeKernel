@@ -22,7 +22,7 @@ namespace ExchangeKernel
         {
             ALREADY_HERE[0] = 1;
             USER_NOT_FOUND[0] = 2;
-            ORDER_NOT_FOUND[0] = 2;
+            ORDER_NOT_FOUND[0] = 3;
         }
         static void Main(string[] args)
         {
